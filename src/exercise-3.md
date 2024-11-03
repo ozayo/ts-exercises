@@ -188,3 +188,150 @@ In this example:
 
 - The `PhoneBook` type maps `string` keys (names) to `number` values (phone numbers).
 - We can add as many name-number pairs as we need, and TypeScript will enforce the `number` type for values.
+
+## Övning 4: Type Assertions
+
+Mål: Förstå hur och när man använder type assertions, och vilka risker som kan vara involverade.
+
+### Enkel Type Assertion
+
+Givet en variabel let someValue: unknown = "Hello World";, använd type assertion för att behandla den som en string och anropa someValue.length.
+
+**Lösning**
+
+```ts
+let someValue: unknown = "Hello World";
+
+// Type assertion to treat someValue as a string
+let strLength: number = (someValue as string).length;
+
+console.log(strLength); // Output: 11
+```
+
+In this example:
+
+- `someValue` is initially of type `unknown`, meaning TypeScript doesn’t know its specific type.
+- By using `someValue as string`, we assert that `someValue` is of type `string`, allowing us to access `string` properties like `length`.
+- `strLength` now holds the length of the string.
+
+
+### Dubbel Type Assertion
+
+Konvertera en string till number via unknown
+
+```ts
+let someString: string = "123";
+let someNumber: number = someString as unknown as number;
+
+console.log(someNumber); // Output: 123, but treated as a number
+```
+In this example:
+
+- We start with someString as a string type.
+- Using a double type assertion, we first cast it to unknown, then to number.
+- This is risky and generally discouraged, as it can lead to unexpected results if someString doesn’t represent a valid number.
+
+## Övning 5: Typade Asynkrona Funktioner och Promises
+
+Mål: Lära sig att typa asynkrona funktioner och hantera Promise-objekt i TypeScript.
+
+### Asynkron Funktion med Promise
+
+Skriv en funktion fetchNumber som returnerar en Promise som resolver till talet 42 efter 2 sekunder.
+
+```ts
+function fetchNumber(): Promise<number> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(42);
+    }, 2000);
+  });
+}
+
+// Usage
+fetchNumber().then((number) => console.log(number)); // Output after 2 seconds: 42
+```
+In this example:
+
+- fetchNumber returns a Promise<number>, which means the function will eventually resolve with a number.
+- After a 2-second delay (simulated with setTimeout), the Promise resolves with the value 42.
+- Using .then(), we log the result once the Promise resolves.
+
+### Använda async/await
+
+Skriv en asynkron funktion getAnswer som använder await för att hämta värdet från fetchNumber och loggar resultatet.
+
+```ts
+async function getAnswer(): Promise<void> {
+  const result = await fetchNumber();
+  console.log(result);
+}
+
+// Usage
+getAnswer(); // Output after 2 seconds: 42
+
+```
+
+In this example:
+
+- getAnswer is an asynchronous function (async) that waits for fetchNumber to complete.
+- By using await, getAnswer pauses until fetchNumber resolves and then logs the result.
+- The function returns Promise<void>, as it doesn’t return any specific value but simply logs the result.
+
+
+## Övning 6: Typade API-anrop
+
+Mål: Praktisera att göra typade API-anrop och hantera asynkron data.
+
+### Definiera Gränssnitt för API-svar
+
+Använd en publik API, till exempel JSONPlaceholder: https://jsonplaceholder.typicode.com/posts/1
+
+Definiera ett interface Post som matchar strukturen av data som returneras.
+
+**Lösning:**
+
+```json
+{
+  "userId": 1,
+  "id": 1,
+  "title": "Sample Title",
+  "body": "Sample Body"
+}
+```
+
+```ts
+interface Post {
+  userId: number;
+  id: number;
+  title: string;
+  body: string;
+}
+```
+
+In this example:
+
+- The Post interface defines the structure of the data we expect from the API. It includes userId, id, title, and body, each with appropriate types.
+
+### Gör ett API-anrop:
+
+Skriv en asynkron funktion getPost som hämtar data från API och returnerar ett Post-objekt.
+
+**Lösning:**
+
+```ts
+async function getPost(postId: number): Promise<Post> {
+  const response = await fetch(`https://jsonplaceholder.typicode.com/posts/${postId}`);
+  const data: Post = await response.json();
+  return data;
+}
+
+// Usage
+getPost(1).then((post) => console.log(post));
+```
+
+In this example:
+
+- getPost is an asynchronous function that takes a postId parameter and returns a Promise<Post>.
+- It fetches data from the JSONPlaceholder API, and TypeScript infers the data variable as type Post.
+- The returned data object conforms to the Post interface, ensuring type safety.
